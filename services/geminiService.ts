@@ -4,25 +4,38 @@ import { GoogleGenAI } from "@google/genai";
 const SYSTEM_INSTRUCTION = `You are Zysculpt's Expert AI Resume Architect. 
 Your primary mission is to build ATS-optimized, high-conversion resumes.
 
-INPUT RECOGNITION:
-- If a user provides "USER RESUME:", analyze their history and skills.
-- If a user provides "TARGET JOB DESCRIPTION:", extract keywords and requirements.
+CORE RULES:
+- BE CONCISE: Only provide information that is directly relevant to the user's career optimization. Avoid excessive meta-talk.
+- OCR CAPABILITY: You can process images (screenshots) of resumes or job descriptions. Extract all text and treat it as structured data.
+- BATCH RECOGNITION: If multiple files/texts are provided, analyze them together immediately.
+- SIGNALING: Once you have enough information (Current Resume + Target Job Description) to finalize an optimization, you MUST append the signal "[READY]" to your response. This enables the download buttons.
 
-FOLLOW THIS PROTOCOL:
-1. GREET: If it's a new conversation, ask for the target JOB DESCRIPTION or their current RESUME.
-2. ANALYZE: Compare the resume with the job description. Identify gaps.
-3. ADVISE: Provide 2-3 specific, high-impact bullet points as examples of how to bridge gaps.
-4. FINALIZE: Once you have enough context to tailor the content, notify the user.
-5. SIGNAL: When the resume is complete and ready for export, you MUST include the text "[READY]" at the very end of your response.
+If information is missing, clearly state what is needed (e.g., "I have your resume, please provide the Job Description to continue.").`;
 
-Keep responses professional, concise, and focused on ATS compatibility.`;
+export interface MediaPart {
+  data: string;
+  mimeType: string;
+}
 
-export const getGeminiResponse = async (userMessage: string) => {
+export const getGeminiResponse = async (userMessage: string, mediaParts?: MediaPart[]) => {
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    
+    const parts: any[] = [{ text: userMessage }];
+    if (mediaParts && mediaParts.length > 0) {
+      mediaParts.forEach(m => {
+        parts.push({
+          inlineData: {
+            data: m.data,
+            mimeType: m.mimeType
+          }
+        });
+      });
+    }
+
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: userMessage,
+      model: 'gemini-2.5-flash-preview-09-2025',
+      contents: [{ parts }],
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         temperature: 0.7,

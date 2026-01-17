@@ -21,7 +21,12 @@ const Dropdown: React.FC<DropdownProps> = ({ label, items }) => {
   }, []);
 
   return (
-    <div className="relative group" ref={dropdownRef}>
+    <div 
+      className="relative group" 
+      ref={dropdownRef}
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors"
@@ -41,17 +46,19 @@ const Dropdown: React.FC<DropdownProps> = ({ label, items }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-1">
-          <div className="py-2">
-            {items.map((item, idx) => (
-              <a
-                key={idx}
-                href="#"
-                className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1918f0] transition-colors"
-              >
-                {item}
-              </a>
-            ))}
+        <div className="absolute left-0 mt-0 pt-2 w-56 bg-transparent z-50">
+          <div className="bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-1">
+            <div className="py-2">
+              {items.map((item, idx) => (
+                <a
+                  key={idx}
+                  href="#"
+                  className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1918f0] transition-colors"
+                >
+                  {item}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       )}
