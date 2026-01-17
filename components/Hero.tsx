@@ -14,14 +14,16 @@ const Hero: React.FC = () => {
           {/* Left Column: Text */}
           <div className="max-w-2xl">
             <h1 className="text-5xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-8">
-              <span className="text-gray-300">Get </span>
-              <span className="text-black">hired</span>
-              <span className="text-gray-300"> faster with a resume built for your </span>
-              <span className="text-black">dream job.</span>
+              <span className="text-gray-300 font-normal">The </span>
+              <span className="text-black font-extrabold">AI resume builder</span>
+              <span className="text-gray-300 font-normal"> that helps you get </span>
+              <span className="text-black font-extrabold">hired</span>
+              <span className="text-gray-300 font-normal"> at your </span>
+              <span className="text-black font-extrabold">dream job.</span>
             </h1>
             
             <p className="text-xl text-gray-600 leading-relaxed max-w-xl">
-              Zysculpt analyzes any job description to build an <span className="font-bold text-gray-900">ATS-friendly</span>, <span className="font-bold text-gray-900">recruiter-ready</span> resume in minutes.
+              Zysculpt turns your experience and any job description into a resume recruiters want to read.
             </p>
           </div>
 

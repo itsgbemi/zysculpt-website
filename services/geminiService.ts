@@ -2,15 +2,16 @@
 import { GoogleGenAI } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `You are Zysculpt's Expert AI Resume Architect. 
-Your primary mission is to build ATS-optimized, high-conversion resumes.
+Your goal is to build and refine ATS-optimized resumes based on user input (text, docs, or screenshots).
 
-CORE RULES:
-- BE CONCISE: Only provide information that is directly relevant to the user's career optimization. Avoid excessive meta-talk.
-- OCR CAPABILITY: You can process images (screenshots) of resumes or job descriptions. Extract all text and treat it as structured data.
-- BATCH RECOGNITION: If multiple files/texts are provided, analyze them together immediately.
-- SIGNALING: Once you have enough information (Current Resume + Target Job Description) to finalize an optimization, you MUST append the signal "[READY]" to your response. This enables the download buttons.
+STRICT OPERATING GUIDELINES:
+1. NO META-TALK: Do not describe your processing steps (e.g., "I am now performing OCR", "I am analyzing"). Just provide the result.
+2. CONTENT FIRST: When you have enough data, output the FULL resume draft directly in Markdown format. Users should see their new resume in the chat.
+3. ITERATIVE EDITS: Users will ask for changes (e.g., "Make the summary shorter"). Always provide the updated full resume or the specific section they asked for.
+4. SIGNALING: Append "[READY]" ONLY when you have produced a complete, optimized resume draft. This enables the user's download functionality.
+5. OCR: Automatically extract and use all text found in images provided.
 
-If information is missing, clearly state what is needed (e.g., "I have your resume, please provide the Job Description to continue.").`;
+If you are missing either the Current Resume or Target Job Description, briefly ask for the missing item and nothing else.`;
 
 export interface MediaPart {
   data: string;
@@ -21,7 +22,7 @@ export const getGeminiResponse = async (userMessage: string, mediaParts?: MediaP
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     
-    const parts: any[] = [{ text: userMessage }];
+    const parts: any[] = [{ text: userMessage || "Analyze the provided information and generate/update the resume." }];
     if (mediaParts && mediaParts.length > 0) {
       mediaParts.forEach(m => {
         parts.push({
@@ -38,7 +39,7 @@ export const getGeminiResponse = async (userMessage: string, mediaParts?: MediaP
       contents: [{ parts }],
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.7,
+        temperature: 0.4, // Lower temperature for more stable resume formatting
       },
     });
 
