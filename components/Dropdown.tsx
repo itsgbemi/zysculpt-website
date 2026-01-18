@@ -22,14 +22,14 @@ const Dropdown: React.FC<DropdownProps> = ({ label, items }) => {
 
   return (
     <div 
-      className="relative group" 
+      className="relative group font-['Work_Sans']" 
       ref={dropdownRef}
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors"
+        className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-[#475569] hover:text-[#0f172a] transition-colors tracking-tight"
       >
         {label}
         <svg
@@ -53,7 +53,7 @@ const Dropdown: React.FC<DropdownProps> = ({ label, items }) => {
                 <a
                   key={idx}
                   href="#"
-                  className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1918f0] transition-colors"
+                  className="block px-4 py-2.5 text-sm text-[#64748b] hover:bg-gray-50 hover:text-[#1918f0] transition-colors tracking-tight"
                 >
                   {item}
                 </a>
