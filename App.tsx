@@ -17,20 +17,20 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col selection:bg-[#1918f0]/10 selection:text-[#1918f0] text-[#0f172a] tracking-tight-custom">
-      <Header />
+      <Header onNavigate={setActiveMode} />
       
       {/* Inner Navigation */}
-      <nav className="bg-white border-b border-gray-100 py-3">
+      <nav className="bg-white border-b border-gray-200 pt-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-start overflow-x-auto no-scrollbar gap-2">
+          <div className="flex justify-start overflow-x-auto no-scrollbar gap-1 -mb-px">
             {navItems.map((item) => (
               <button
                 key={item.value}
                 onClick={() => setActiveMode(item.value)}
-                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap flex-shrink-0 border border-transparent ${
+                className={`px-6 py-2.5 rounded-t-xl rounded-b-none text-sm font-bold transition-all whitespace-nowrap flex-shrink-0 border-t border-l border-r ${
                   activeMode === item.value 
-                  ? 'bg-[#e0f2fe] text-[#1918f0] shadow-sm' 
-                  : 'text-[#64748b] hover:text-[#0f172a] hover:bg-gray-50'
+                  ? 'bg-[#e0f2fe] text-[#1918f0] border-gray-200' 
+                  : 'text-[#64748b] hover:text-[#0f172a] hover:bg-gray-50 border-transparent'
                 }`}
               >
                 {item.label}
@@ -43,7 +43,7 @@ const App: React.FC = () => {
       <main className="flex-1">
         <Hero mode={activeMode} />
       </main>
-      <Footer />
+      <Footer onNavigate={setActiveMode} />
     </div>
   );
 };

@@ -1,7 +1,11 @@
 
 import React from 'react';
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  onNavigate: (mode: 'resume' | 'cover_letter' | 'resignation') => void;
+}
+
+const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = [
@@ -23,6 +27,19 @@ const Footer: React.FC = () => {
     }
   ];
 
+  const handleLinkClick = (e: React.MouseEvent, link: string) => {
+    if (link === 'AI Resume Builder') {
+      e.preventDefault();
+      onNavigate('resume');
+    } else if (link === 'AI Cover Letter Builder') {
+      e.preventDefault();
+      onNavigate('cover_letter');
+    } else if (link === 'AI Resignation Letter Builder') {
+      e.preventDefault();
+      onNavigate('resignation');
+    }
+  };
+
   return (
     <footer className="bg-white border-t border-gray-100 font-['Work_Sans']">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
@@ -36,7 +53,11 @@ const Footer: React.FC = () => {
               <ul className="space-y-4">
                 {column.links.map((link, linkIdx) => (
                   <li key={linkIdx}>
-                    <a href="#" className="text-[#64748b] hover:text-[#1918f0] text-sm transition-colors tracking-tight">
+                    <a 
+                      href={link.includes('About') || link.includes('Contact') ? '#' : 'https://app.zysculpt.com'} 
+                      onClick={(e) => handleLinkClick(e, link)}
+                      className="text-[#64748b] hover:text-[#1918f0] text-sm transition-colors tracking-tight"
+                    >
                       {link}
                     </a>
                   </li>
@@ -51,7 +72,7 @@ const Footer: React.FC = () => {
 
         {/* Bottom Info */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center group cursor-pointer">
+          <div className="flex items-center group cursor-pointer" onClick={() => onNavigate('resume')}>
             <svg className="w-6 h-6 text-[#0f172a]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 3L14.5 8.5L20 11L14.5 13.5L12 19L9.5 13.5L4 11L9.5 8.5L12 3Z"></path>
             </svg>

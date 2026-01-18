@@ -4,9 +4,10 @@ import React, { useState, useRef, useEffect } from 'react';
 interface DropdownProps {
   label: string;
   items: string[];
+  onItemClick?: (item: string) => void;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ label, items }) => {
+const Dropdown: React.FC<DropdownProps> = ({ label, items, onItemClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -19,6 +20,11 @@ const Dropdown: React.FC<DropdownProps> = ({ label, items }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleItemClick = (item: string) => {
+    if (onItemClick) onItemClick(item);
+    setIsOpen(false);
+  };
 
   return (
     <div 
@@ -50,13 +56,13 @@ const Dropdown: React.FC<DropdownProps> = ({ label, items }) => {
           <div className="bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-1">
             <div className="py-2">
               {items.map((item, idx) => (
-                <a
+                <button
                   key={idx}
-                  href="#"
-                  className="block px-4 py-2.5 text-sm text-[#64748b] hover:bg-gray-50 hover:text-[#1918f0] transition-colors tracking-tight"
+                  onClick={() => handleItemClick(item)}
+                  className="w-full text-left block px-4 py-2.5 text-sm text-[#64748b] hover:bg-gray-50 hover:text-[#1918f0] transition-colors tracking-tight"
                 >
                   {item}
-                </a>
+                </button>
               ))}
             </div>
           </div>

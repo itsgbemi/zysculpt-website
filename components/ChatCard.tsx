@@ -212,7 +212,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
   };
 
   return (
-    <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 flex flex-col h-[560px] transform hover:scale-[1.01] transition-all duration-300 z-10 font-['Work_Sans']">
+    <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 flex flex-col h-[480px] transform hover:scale-[1.01] transition-all duration-300 z-10 font-['Work_Sans']">
       <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} accept=".pdf,.doc,.docx,.txt,image/*" multiple />
 
       {/* Header */}
@@ -223,7 +223,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
           </div>
           <div>
             <h3 className="text-white font-bold text-lg leading-tight capitalize tracking-tight">{mode.replace('_', ' ')}</h3>
-            <p className="text-white/70 text-[10px] tracking-wider font-semibold">Architecting your future</p>
+            <p className="text-white/70 text-[10px] font-semibold">Architecting your future</p>
           </div>
         </div>
       </div>
