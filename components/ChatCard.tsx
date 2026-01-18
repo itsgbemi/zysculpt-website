@@ -30,17 +30,63 @@ const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, 
   );
 };
 
+const SuggestionChips: React.FC<{ suggestions: string[]; onSelect: (s: string) => void; selected: string }> = ({ suggestions, onSelect, selected }) => (
+  <div className="flex flex-wrap gap-2 mt-2">
+    {suggestions.map((s) => (
+      <button
+        key={s}
+        type="button"
+        onClick={() => onSelect(s)}
+        className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
+          selected === s 
+          ? 'bg-[#1918f0] text-white border-[#1918f0]' 
+          : 'bg-white text-[#475569] border-gray-200 hover:border-[#1918f0] hover:text-[#1918f0]'
+        }`}
+      >
+        {s}
+      </button>
+    ))}
+  </div>
+);
+
 const FormattedText: React.FC<{ 
   text: string; 
   isResume?: boolean; 
+  isResignation?: boolean;
   onDownload?: (format: 'pdf' | 'docx') => void;
-}> = ({ text, isResume, onDownload }) => {
+}> = ({ text, isResume, isResignation, onDownload }) => {
+  const [view, setView] = useState<'letter' | 'email'>(isResignation ? 'letter' : 'letter');
   const lines = text.split('\n');
+
+  // Basic parsing for email view
+  const subjectLine = lines.find(l => l.toLowerCase().includes('subject:'))?.replace(/subject:/i, '').trim() || "Resignation Letter";
+  const bodyLines = lines.filter(l => !l.toLowerCase().includes('subject:') && !l.startsWith('#') && !l.startsWith('##'));
+
+  const handleCopy = (content: string) => {
+    navigator.clipboard.writeText(content);
+  };
 
   return (
     <div className="relative group/content">
-      {isResume && (
-        <div className="flex items-center gap-2 mb-4 p-1.5 bg-gray-100/50 rounded-xl w-fit border border-gray-200">
+      {(isResume || isResignation) && (
+        <div className="flex flex-wrap items-center gap-2 mb-4 p-1.5 bg-gray-100/50 rounded-xl w-fit border border-gray-200">
+          {isResignation && (
+            <div className="flex bg-white rounded-lg p-0.5 border border-gray-200 mr-2 shadow-sm">
+              <button 
+                onClick={() => setView('letter')}
+                className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${view === 'letter' ? 'bg-[#1918f0] text-white' : 'text-[#64748b] hover:text-[#0f172a]'}`}
+              >
+                LETTER
+              </button>
+              <button 
+                onClick={() => setView('email')}
+                className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${view === 'email' ? 'bg-[#1918f0] text-white' : 'text-[#64748b] hover:text-[#0f172a]'}`}
+              >
+                EMAIL
+              </button>
+            </div>
+          )}
+          
           <button 
             onClick={() => onDownload?.('pdf')} 
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 rounded-lg shadow-sm text-[#0f172a] hover:text-[#1918f0] transition-all border border-gray-200"
@@ -62,23 +108,45 @@ const FormattedText: React.FC<{
           </button>
         </div>
       )}
-      <div className={`space-y-1 ${isResume ? 'leading-relaxed' : ''} text-black`} style={{ fontFamily: isResume ? "'EB Garamond', serif" : "'Work Sans', sans-serif" }}>
-        {lines.map((line, i) => {
-          const trimmed = line.trim();
-          if (trimmed.startsWith('# ')) return <h1 key={i} className="text-xl font-bold mt-4 mb-2">{trimmed.replace('# ', '')}</h1>;
-          if (trimmed.startsWith('## ')) return <h2 key={i} className="text-lg font-bold mt-3 mb-1 border-b border-gray-200 uppercase tracking-wide">{trimmed.replace('## ', '')}</h2>;
-          if (trimmed.startsWith('### ')) return <h3 key={i} className="text-md font-bold mt-2 mb-1">{trimmed.replace('### ', '')}</h3>;
-          
-          const boldParts = line.split(/(\*\*.*?\*\*)/g);
-          const renderedLine = boldParts.map((part, j) => {
-            if (part.startsWith('**') && part.endsWith('**')) {
-              return <strong key={j} className="font-bold text-black">{part.slice(2, -2)}</strong>;
-            }
-            return part;
-          });
-          return <p key={i} className="min-h-[1em]">{renderedLine}</p>;
-        })}
-      </div>
+
+      {view === 'email' ? (
+        <div className="space-y-4 animate-in fade-in duration-300">
+          <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[9px] font-bold uppercase text-[#64748b]">Subject</span>
+              <button onClick={() => handleCopy(subjectLine)} className="text-[9px] text-[#1918f0] font-bold hover:underline">Copy</button>
+            </div>
+            <p className="text-sm font-semibold text-black">{subjectLine}</p>
+          </div>
+          <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[9px] font-bold uppercase text-[#64748b]">Message Body</span>
+              <button onClick={() => handleCopy(bodyLines.join('\n').trim())} className="text-[9px] text-[#1918f0] font-bold hover:underline">Copy</button>
+            </div>
+            <div className="text-sm text-black whitespace-pre-line leading-relaxed">
+              {bodyLines.join('\n').trim()}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className={`space-y-1 ${isResume || isResignation ? 'leading-relaxed text-black' : 'text-inherit'}`} style={{ fontFamily: isResume || isResignation ? "'EB Garamond', serif" : "'Work Sans', sans-serif" }}>
+          {lines.map((line, i) => {
+            const trimmed = line.trim();
+            if (trimmed.startsWith('# ')) return <h1 key={i} className="text-xl font-bold mt-4 mb-2">{trimmed.replace('# ', '')}</h1>;
+            if (trimmed.startsWith('## ')) return <h2 key={i} className="text-lg font-bold mt-3 mb-1 border-b border-gray-200 uppercase tracking-wide">{trimmed.replace('## ', '')}</h2>;
+            if (trimmed.startsWith('### ')) return <h3 key={i} className="text-md font-bold mt-2 mb-1">{trimmed.replace('### ', '')}</h3>;
+            
+            const boldParts = line.split(/(\*\*.*?\*\*)/g);
+            const renderedLine = boldParts.map((part, j) => {
+              if (part.startsWith('**') && part.endsWith('**')) {
+                return <strong key={j} className="font-bold">{part.slice(2, -2)}</strong>;
+              }
+              return part;
+            });
+            return <p key={i} className="min-h-[1em]">{renderedLine}</p>;
+          })}
+        </div>
+      )}
     </div>
   );
 };
@@ -108,6 +176,113 @@ const FileBadge: React.FC<{ file: FileInfo; variant?: 'bubble' | 'preview'; onRe
   </div>
 );
 
+interface DocumentSetupFormProps {
+  mode: 'cover_letter' | 'resignation';
+  onSubmit: (data: string) => void;
+}
+
+const DocumentSetupForm: React.FC<DocumentSetupFormProps> = ({ mode, onSubmit }) => {
+  // Resignation Fields
+  const [resName, setResName] = useState('');
+  const [resPosition, setResPosition] = useState('');
+  const [resCompany, setResCompany] = useState('');
+  const [resRecipientName, setResRecipientName] = useState('');
+  const [resRecipientTitle, setResRecipientTitle] = useState('');
+  const [resLetterDate, setResLetterDate] = useState('');
+  const [resLastDay, setResLastDay] = useState('');
+  const [resReason, setResReason] = useState('');
+
+  // Cover Letter Fields
+  const [covRole, setCovRole] = useState('');
+  const [covCompany, setCovCompany] = useState('');
+  const [covStrength, setCovStrength] = useState('');
+
+  const suggestions = mode === 'resignation' 
+    ? ["New Opportunity", "Relocation", "Personal Growth", "Career Change", "Health Reasons"]
+    : ["Leadership", "Problem Solving", "Technical Skills", "Communication", "Efficiency"];
+
+  const handleLocalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (mode === 'resignation') {
+      if (!resName || !resPosition || !resCompany || !resRecipientName || !resRecipientTitle || !resLetterDate || !resLastDay) return;
+      const summary = `Resignation Details:\n- Name: **${resName}**\n- Current Position: **${resPosition}**\n- Current Company: **${resCompany}**\n- Recipient: **${resRecipientName}**\n- Recipient Title: **${resRecipientTitle}**\n- Letter Writing Date: **${resLetterDate}**\n- Official Last Day: **${resLastDay}**\n- Primary Reason: **${resReason || 'Not specified'}**`;
+      onSubmit(summary);
+    } else {
+      if (!covRole || !covCompany || !covStrength) return;
+      const summary = `Application Details:\n- Target Position: **${covRole}**\n- Target Company: **${covCompany}**\n- Key Strength: **${covStrength}**`;
+      onSubmit(summary);
+    }
+  };
+
+  if (mode === 'resignation') {
+    return (
+      <form onSubmit={handleLocalSubmit} className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm mt-2 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300 max-h-[400px] overflow-y-auto no-scrollbar">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Your Full Name</label>
+            <input type="text" value={resName} onChange={(e) => setResName(e.target.value)} placeholder="e.g. John Doe" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Your Current Position</label>
+            <input type="text" value={resPosition} onChange={(e) => setResPosition(e.target.value)} placeholder="e.g. Project Lead" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Current Company Name</label>
+            <input type="text" value={resCompany} onChange={(e) => setResCompany(e.target.value)} placeholder="e.g. Acme Corp" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Letter Writing Date</label>
+            <input type="date" value={resLetterDate} onChange={(e) => setResLetterDate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Recipient Name</label>
+            <input type="text" value={resRecipientName} onChange={(e) => setResRecipientName(e.target.value)} placeholder="e.g. Sarah Smith" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Recipient Title</label>
+            <input type="text" value={resRecipientTitle} onChange={(e) => setResRecipientTitle(e.target.value)} placeholder="e.g. HR Manager" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
+          </div>
+        </div>
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Official Last Day</label>
+          <input type="date" value={resLastDay} onChange={(e) => setResLastDay(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
+        </div>
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Primary Reason</label>
+          <SuggestionChips suggestions={suggestions} selected={resReason} onSelect={setResReason} />
+        </div>
+        <button type="submit" className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${resName && resCompany && resRecipientName && resRecipientTitle && resLetterDate && resLastDay ? 'primary-btn shadow-lg shadow-[#1918f0]/20' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}>
+          Start Building
+        </button>
+      </form>
+    );
+  }
+
+  return (
+    <form onSubmit={handleLocalSubmit} className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm mt-2 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+      <div className="space-y-1">
+        <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Target Position</label>
+        <input type="text" value={covRole} onChange={(e) => setCovRole(e.target.value)} placeholder="e.g. Marketing Lead" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
+      </div>
+      <div className="space-y-1">
+        <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Target Company</label>
+        <input type="text" value={covCompany} onChange={(e) => setCovCompany(e.target.value)} placeholder="e.g. Acme Corp" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
+      </div>
+      <div className="space-y-1">
+        <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Key Strength</label>
+        <SuggestionChips suggestions={suggestions} selected={covStrength} onSelect={setCovStrength} />
+      </div>
+      <button type="submit" className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${covRole && covCompany && covStrength ? 'primary-btn shadow-lg shadow-[#1918f0]/20' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}>
+        Start Building
+      </button>
+    </form>
+  );
+};
+
 interface ChatCardProps {
   mode: 'resume' | 'cover_letter' | 'resignation';
 }
@@ -115,8 +290,8 @@ interface ChatCardProps {
 const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
   const getInitialMessage = () => {
     switch(mode) {
-      case 'cover_letter': return "Hi! I'm your **Cover Letter Architect**. Share your background and the job you're eyeing to craft a compelling story.";
-      case 'resignation': return "Hi! I'm your **Resignation Guide**. I'll help you write a professional and graceful exit letter.";
+      case 'cover_letter': return "Hi! I'm your **Cover Letter Architect**. To build a persuasive letter, please fill in the quick details below or upload your files.";
+      case 'resignation': return "Hi! I'm your **Resignation Guide**. Let's draft a professional exit. Provide a few details below to get started immediately.";
       default: return INITIAL_RESUME_CONTENT;
     }
   };
@@ -128,12 +303,16 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load history from localStorage
   useEffect(() => {
     const saved = localStorage.getItem(`zysculpt_chat_${mode}`);
     if (saved) {
       try {
-        setMessages(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        if (parsed.length > 0) {
+          setMessages(parsed);
+        } else {
+          setMessages([{ role: 'assistant', content: getInitialMessage() }]);
+        }
       } catch (e) {
         setMessages([{ role: 'assistant', content: getInitialMessage() }]);
       }
@@ -144,7 +323,6 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
     setInput('');
   }, [mode]);
 
-  // Persist to localStorage
   useEffect(() => {
     if (messages.length > 0) {
       localStorage.setItem(`zysculpt_chat_${mode}`, JSON.stringify(messages));
@@ -179,6 +357,19 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const handleFormSubmit = async (formData: string) => {
+    setMessages(prev => [...prev, { role: 'user', content: formData }]);
+    setIsLoading(true);
+    try {
+      const response = await getGeminiResponse(formData, mode, []);
+      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+    } catch (error) {
+      setMessages(prev => [...prev, { role: 'assistant', content: "Error processing request." }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if ((!input.trim() && stagedFiles.length === 0) || isLoading) return;
@@ -211,6 +402,8 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
     }
   };
 
+  const showFormInChat = messages.length === 1 && (mode === 'cover_letter' || mode === 'resignation');
+
   return (
     <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 flex flex-col h-[480px] transform hover:scale-[1.01] transition-all duration-300 z-10 font-['Work_Sans']">
       <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} accept=".pdf,.doc,.docx,.txt,image/*" multiple />
@@ -232,15 +425,25 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth bg-gray-50/10 no-scrollbar">
         {messages.map((m, i) => {
           const isDoc = m.role === 'assistant' && (m.content.includes('# ') || m.content.includes('## '));
+          const isResignationDoc = isDoc && mode === 'resignation';
           return (
             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed ${m.role === 'user' ? 'bg-[#1918f0] text-black rounded-tr-none shadow-md' : 'bg-white text-black rounded-tl-none border border-gray-100 shadow-sm'}`}>
+              <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed ${m.role === 'user' ? 'bg-[#1918f0] text-white rounded-tr-none shadow-md' : 'bg-white text-black rounded-tl-none border border-gray-100 shadow-sm'}`}>
                 {m.files && m.files.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-2">
                     {m.files.map((f, idx) => <div key={idx} className="w-40 flex-shrink-0"><FileBadge file={f} variant={m.role === 'user' ? 'bubble' : 'preview'} /></div>)}
                   </div>
                 )}
-                {m.content && <FormattedText text={m.content} isResume={isDoc} onDownload={handleDownload} />}
+                <FormattedText 
+                  text={m.content} 
+                  isResume={isDoc} 
+                  isResignation={isResignationDoc}
+                  onDownload={handleDownload} 
+                />
+                
+                {i === 0 && showFormInChat && (
+                  <DocumentSetupForm mode={mode as any} onSubmit={handleFormSubmit} />
+                )}
               </div>
             </div>
           );

@@ -30,7 +30,7 @@ const Hero: React.FC<HeroProps> = ({ mode }) => {
   const { title, desc } = getHeroContent();
 
   return (
-    <section className="relative overflow-hidden pt-12 pb-24 lg:pt-20 lg:pb-40 bg-gradient-to-br from-[#f0f9ff] to-[#f5f3ff]">
+    <section className="relative overflow-hidden pt-12 pb-24 lg:pt-20 lg:pb-40 bg-[#dff1fe]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="max-w-2xl">
