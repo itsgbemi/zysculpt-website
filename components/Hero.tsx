@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ChatCard from './ChatCard.tsx';
 
@@ -30,14 +29,14 @@ const Hero: React.FC<HeroProps> = ({ mode }) => {
   const { title, desc } = getHeroContent();
 
   return (
-    <section className="relative overflow-hidden pt-12 pb-24 lg:pt-20 lg:pb-40 bg-[#dff1fe]">
+    <section className="relative overflow-hidden pt-12 pb-24 lg:pt-20 lg:pb-40 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="max-w-2xl">
-            <h1 className="text-5xl lg:text-7xl font-extrabold leading-[1.1] tracking-tighter mb-8 text-[#0f172a]">
+            <h1 className="text-5xl lg:text-7xl font-extrabold leading-[1.1] tracking-tighter mb-8 text-[#110584]">
               {title}
             </h1>
-            <p className="text-xl text-[#475569] leading-relaxed max-w-xl tracking-tight">
+            <p className="text-xl text-[#110584]/80 leading-relaxed max-w-xl tracking-tight">
               {desc}
             </p>
           </div>

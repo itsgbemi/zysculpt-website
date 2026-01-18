@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from './components/Header.tsx';
 import Hero from './components/Hero.tsx';
@@ -29,9 +28,10 @@ const App: React.FC = () => {
                 onClick={() => setActiveMode(item.value)}
                 className={`px-6 py-2.5 rounded-t-xl rounded-b-none text-sm font-bold transition-all whitespace-nowrap flex-shrink-0 border-t border-l border-r ${
                   activeMode === item.value 
-                  ? 'bg-[#e0f2fe] text-[#1918f0] border-gray-200' 
+                  ? 'text-[#1918f0] border-[#1918f0] border-b-white z-10' 
                   : 'text-[#64748b] hover:text-[#0f172a] hover:bg-gray-50 border-transparent'
                 }`}
+                style={activeMode === item.value ? { borderBottomWidth: '2px', borderBottomColor: '#1918f0' } : {}}
               >
                 {item.label}
               </button>

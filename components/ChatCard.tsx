@@ -1,11 +1,14 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { getGeminiResponse, MediaPart } from '../services/geminiService.ts';
 import { ChatMessage, FileInfo, StagedFile } from '../types.ts';
 
 const INITIAL_RESUME_CONTENT = "Hi! I'm **Resume Builder**. Share your **current resume** and the **job description** you're targeting to get started.\n\nYou can upload **documents**, **images**, or paste **text**. I'll generate your optimized resume right here!";
 
-const TOOLTIP_STYLES = "absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-gray-50 border border-gray-200 text-[#0f172a] text-[10px] font-bold rounded-lg shadow-xl whitespace-nowrap z-[100] animate-in fade-in zoom-in duration-200";
+const TOOLTIP_STYLES = "absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-gray-50 border border-gray-200 text-[#110584] text-[10px] font-bold rounded-lg shadow-xl whitespace-nowrap z-[100] animate-in fade-in zoom-in duration-200";
+
+const RESET_ICON = <svg fill="currentColor" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5"><path d="M960 0v112.941c467.125 0 847.059 379.934 847.059 847.059 0 467.125-379.934 847.059-847.059 847.059-467.125 0-847.059-379.934-847.059-847.059 0-267.106 126.607-515.915 338.824-675.727v393.374h112.94V112.941H0v112.941h342.89C127.058 407.38 0 674.711 0 960c0 529.355 430.645 960 960 960s960-430.645 960-960S1489.355 0 960 0" fill-rule="evenodd"></path></svg>;
+
+const HEADER_ICON = <svg className="w-8 h-8 text-white transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L14.5 8.5L20 11L14.5 13.5L12 19L9.5 13.5L4 11L9.5 8.5L12 3Z"></path><path d="M5 3L6 5L8 6L6 7L5 9L4 7L2 6L4 5L5 3Z"></path><path d="M19 15L20 17L22 18L20 19L19 21L18 19L16 18L18 17L19 15Z"></path></svg>;
 
 const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -58,7 +61,6 @@ const FormattedText: React.FC<{
   const [view, setView] = useState<'letter' | 'email'>(isResignation ? 'letter' : 'letter');
   const lines = text.split('\n');
 
-  // Basic parsing for email view
   const subjectLine = lines.find(l => l.toLowerCase().includes('subject:'))?.replace(/subject:/i, '').trim() || "Resignation Letter";
   const bodyLines = lines.filter(l => !l.toLowerCase().includes('subject:') && !l.startsWith('#') && !l.startsWith('##'));
 
@@ -74,13 +76,13 @@ const FormattedText: React.FC<{
             <div className="flex bg-white rounded-lg p-0.5 border border-gray-200 mr-2 shadow-sm">
               <button 
                 onClick={() => setView('letter')}
-                className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${view === 'letter' ? 'bg-[#1918f0] text-white' : 'text-[#64748b] hover:text-[#0f172a]'}`}
+                className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${view === 'letter' ? 'bg-[#1918f0] text-white' : 'text-[#475569] hover:text-[#110584]'}`}
               >
                 LETTER
               </button>
               <button 
                 onClick={() => setView('email')}
-                className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${view === 'email' ? 'bg-[#1918f0] text-white' : 'text-[#64748b] hover:text-[#0f172a]'}`}
+                className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${view === 'email' ? 'bg-[#1918f0] text-white' : 'text-[#475569] hover:text-[#110584]'}`}
               >
                 EMAIL
               </button>
@@ -89,7 +91,7 @@ const FormattedText: React.FC<{
           
           <button 
             onClick={() => onDownload?.('pdf')} 
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 rounded-lg shadow-sm text-[#0f172a] hover:text-[#1918f0] transition-all border border-gray-200"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 rounded-lg shadow-sm text-[#110584] hover:text-[#1918f0] transition-all border border-gray-200"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6m-3 3l3 3 3-3"/>
@@ -99,7 +101,7 @@ const FormattedText: React.FC<{
           
           <button 
             onClick={() => onDownload?.('docx')} 
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 rounded-lg shadow-sm text-[#0f172a] hover:text-[#1918f0] transition-all border border-gray-200"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-50 rounded-lg shadow-sm text-[#110584] hover:text-[#1918f0] transition-all border border-gray-200"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h6"/>
@@ -111,19 +113,19 @@ const FormattedText: React.FC<{
 
       {view === 'email' ? (
         <div className="space-y-4 animate-in fade-in duration-300">
-          <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+          <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 text-black">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-[9px] font-bold uppercase text-[#64748b]">Subject</span>
+              <span className="text-[9px] font-bold uppercase text-[#475569]">Subject</span>
               <button onClick={() => handleCopy(subjectLine)} className="text-[9px] text-[#1918f0] font-bold hover:underline">Copy</button>
             </div>
-            <p className="text-sm font-semibold text-black">{subjectLine}</p>
+            <p className="text-sm font-semibold">{subjectLine}</p>
           </div>
-          <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+          <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 text-black">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-[9px] font-bold uppercase text-[#64748b]">Message Body</span>
+              <span className="text-[9px] font-bold uppercase text-[#475569]">Message Body</span>
               <button onClick={() => handleCopy(bodyLines.join('\n').trim())} className="text-[9px] text-[#1918f0] font-bold hover:underline">Copy</button>
             </div>
-            <div className="text-sm text-black whitespace-pre-line leading-relaxed">
+            <div className="text-sm whitespace-pre-line leading-relaxed">
               {bodyLines.join('\n').trim()}
             </div>
           </div>
@@ -152,7 +154,7 @@ const FormattedText: React.FC<{
 };
 
 const FileBadge: React.FC<{ file: FileInfo; variant?: 'bubble' | 'preview'; onRemove?: () => void }> = ({ file, variant = 'preview', onRemove }) => (
-  <div className={`flex items-center gap-2 p-2 rounded-lg shadow-sm max-w-full relative group transition-all ${variant === 'bubble' ? 'bg-white/10 text-white border border-white/20' : 'bg-white border border-gray-100 text-[#0f172a]'}`}>
+  <div className={`flex items-center gap-2 p-2 rounded-lg shadow-sm max-w-full relative group transition-all ${variant === 'bubble' ? 'bg-white/10 text-white border border-white/20' : 'bg-white border border-gray-100 text-[#110584]'}`}>
     <div className={`p-1.5 rounded flex-shrink-0 ${variant === 'bubble' ? 'bg-white/20' : 'bg-[#1918f0]/5 text-[#1918f0]'}`}>
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -160,7 +162,7 @@ const FileBadge: React.FC<{ file: FileInfo; variant?: 'bubble' | 'preview'; onRe
     </div>
     <div className="flex flex-col min-w-0 flex-1">
       <span className="text-[11px] font-semibold truncate">{file.name}</span>
-      <div className={`flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-wider ${variant === 'bubble' ? 'text-white/60' : 'text-[#64748b]'}`}>
+      <div className={`flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-wider ${variant === 'bubble' ? 'text-white/60' : 'text-[#475569]'}`}>
         <span>{file.type}</span>
         <span>•</span>
         <span>{file.size}</span>
@@ -182,7 +184,9 @@ interface DocumentSetupFormProps {
 }
 
 const DocumentSetupForm: React.FC<DocumentSetupFormProps> = ({ mode, onSubmit }) => {
-  // Resignation Fields
+  const [step, setStep] = useState(1);
+  const totalSteps = mode === 'resignation' ? 8 : 3;
+
   const [resName, setResName] = useState('');
   const [resPosition, setResPosition] = useState('');
   const [resCompany, setResCompany] = useState('');
@@ -192,7 +196,6 @@ const DocumentSetupForm: React.FC<DocumentSetupFormProps> = ({ mode, onSubmit })
   const [resLastDay, setResLastDay] = useState('');
   const [resReason, setResReason] = useState('');
 
-  // Cover Letter Fields
   const [covRole, setCovRole] = useState('');
   const [covCompany, setCovCompany] = useState('');
   const [covStrength, setCovStrength] = useState('');
@@ -201,85 +204,71 @@ const DocumentSetupForm: React.FC<DocumentSetupFormProps> = ({ mode, onSubmit })
     ? ["New Opportunity", "Relocation", "Personal Growth", "Career Change", "Health Reasons"]
     : ["Leadership", "Problem Solving", "Technical Skills", "Communication", "Efficiency"];
 
-  const handleLocalSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleNext = () => setStep(s => Math.min(s + 1, totalSteps));
+  
+  const handleLocalSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (mode === 'resignation') {
-      if (!resName || !resPosition || !resCompany || !resRecipientName || !resRecipientTitle || !resLetterDate || !resLastDay) return;
       const summary = `Resignation Details:\n- Name: **${resName}**\n- Current Position: **${resPosition}**\n- Current Company: **${resCompany}**\n- Recipient: **${resRecipientName}**\n- Recipient Title: **${resRecipientTitle}**\n- Letter Writing Date: **${resLetterDate}**\n- Official Last Day: **${resLastDay}**\n- Primary Reason: **${resReason || 'Not specified'}**`;
       onSubmit(summary);
     } else {
-      if (!covRole || !covCompany || !covStrength) return;
       const summary = `Application Details:\n- Target Position: **${covRole}**\n- Target Company: **${covCompany}**\n- Key Strength: **${covStrength}**`;
       onSubmit(summary);
     }
   };
 
-  if (mode === 'resignation') {
-    return (
-      <form onSubmit={handleLocalSubmit} className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm mt-2 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300 max-h-[400px] overflow-y-auto no-scrollbar">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Your Full Name</label>
-            <input type="text" value={resName} onChange={(e) => setResName(e.target.value)} placeholder="e.g. John Doe" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
-          </div>
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Your Current Position</label>
-            <input type="text" value={resPosition} onChange={(e) => setResPosition(e.target.value)} placeholder="e.g. Project Lead" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Current Company Name</label>
-            <input type="text" value={resCompany} onChange={(e) => setResCompany(e.target.value)} placeholder="e.g. Acme Corp" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
-          </div>
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Letter Writing Date</label>
-            <input type="date" value={resLetterDate} onChange={(e) => setResLetterDate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Recipient Name</label>
-            <input type="text" value={resRecipientName} onChange={(e) => setResRecipientName(e.target.value)} placeholder="e.g. Sarah Smith" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
-          </div>
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Recipient Title</label>
-            <input type="text" value={resRecipientTitle} onChange={(e) => setResRecipientTitle(e.target.value)} placeholder="e.g. HR Manager" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
-          </div>
-        </div>
-        <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Official Last Day</label>
-          <input type="date" value={resLastDay} onChange={(e) => setResLastDay(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
-        </div>
-        <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Primary Reason</label>
-          <SuggestionChips suggestions={suggestions} selected={resReason} onSelect={setResReason} />
-        </div>
-        <button type="submit" className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${resName && resCompany && resRecipientName && resRecipientTitle && resLetterDate && resLastDay ? 'primary-btn shadow-lg shadow-[#1918f0]/20' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}>
-          Start Building
-        </button>
-      </form>
-    );
-  }
+  const renderStep = () => {
+    if (mode === 'resignation') {
+      switch(step) {
+        case 1: return <div className="space-y-1"><label className="text-[11px] font-bold text-[#475569] ml-1">Your full name</label><input type="text" value={resName} onChange={(e) => setResName(e.target.value)} placeholder="e.g. John Doe" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-black focus:outline-none focus:border-[#1918f0]" /></div>;
+        case 2: return <div className="space-y-1"><label className="text-[11px] font-bold text-[#475569] ml-1">Your current position</label><input type="text" value={resPosition} onChange={(e) => setResPosition(e.target.value)} placeholder="e.g. Project Lead" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-black focus:outline-none focus:border-[#1918f0]" /></div>;
+        case 3: return <div className="space-y-1"><label className="text-[11px] font-bold text-[#475569] ml-1">Current company name</label><input type="text" value={resCompany} onChange={(e) => setResCompany(e.target.value)} placeholder="e.g. Acme Corp" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-black focus:outline-none focus:border-[#1918f0]" /></div>;
+        case 4: return <div className="space-y-1"><label className="text-[11px] font-bold text-[#475569] ml-1">Recipient name</label><input type="text" value={resRecipientName} onChange={(e) => setResRecipientName(e.target.value)} placeholder="e.g. Sarah Smith" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-black focus:outline-none focus:border-[#1918f0]" /></div>;
+        case 5: return <div className="space-y-1"><label className="text-[11px] font-bold text-[#475569] ml-1">Recipient title</label><input type="text" value={resRecipientTitle} onChange={(e) => setResRecipientTitle(e.target.value)} placeholder="e.g. HR Manager" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-black focus:outline-none focus:border-[#1918f0]" /></div>;
+        case 6: return <div className="space-y-1"><label className="text-[11px] font-bold text-[#475569] ml-1">Letter writing date</label><input type="date" value={resLetterDate} onChange={(e) => setResLetterDate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-black focus:outline-none focus:border-[#1918f0]" /></div>;
+        case 7: return <div className="space-y-1"><label className="text-[11px] font-bold text-[#475569] ml-1">Official last day</label><input type="date" value={resLastDay} onChange={(e) => setResLastDay(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-black focus:outline-none focus:border-[#1918f0]" /></div>;
+        case 8: return <div className="space-y-1"><label className="text-[11px] font-bold text-[#475569] ml-1">Primary reason</label><SuggestionChips suggestions={suggestions} selected={resReason} onSelect={setResReason} /></div>;
+        default: return null;
+      }
+    }
+    switch(step) {
+      case 1: return <div className="space-y-1"><label className="text-[11px] font-bold text-[#475569] ml-1">Target position</label><input type="text" value={covRole} onChange={(e) => setCovRole(e.target.value)} placeholder="e.g. Marketing Lead" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-black focus:outline-none focus:border-[#1918f0]" /></div>;
+      case 2: return <div className="space-y-1"><label className="text-[11px] font-bold text-[#475569] ml-1">Target company</label><input type="text" value={covCompany} onChange={(e) => setCovCompany(e.target.value)} placeholder="e.g. Acme Corp" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-black focus:outline-none focus:border-[#1918f0]" /></div>;
+      case 3: return <div className="space-y-1"><label className="text-[11px] font-bold text-[#475569] ml-1">Key strength</label><SuggestionChips suggestions={suggestions} selected={covStrength} onSelect={setCovStrength} /></div>;
+      default: return null;
+    }
+  };
+
+  const isComplete = mode === 'resignation' 
+    ? (step === 1 && resName) || (step === 2 && resPosition) || (step === 3 && resCompany) || (step === 4 && resRecipientName) || (step === 5 && resRecipientTitle) || (step === 6 && resLetterDate) || (step === 7 && resLastDay) || (step === 8 && resReason)
+    : (step === 1 && covRole) || (step === 2 && covCompany) || (step === 3 && covStrength);
 
   return (
-    <form onSubmit={handleLocalSubmit} className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm mt-2 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-      <div className="space-y-1">
-        <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Target Position</label>
-        <input type="text" value={covRole} onChange={(e) => setCovRole(e.target.value)} placeholder="e.g. Marketing Lead" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
+    <div className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm mt-2 animate-in fade-in slide-in-from-top-2">
+      {renderStep()}
+      <div className="mt-4 flex items-center justify-between">
+        <div className="text-[10px] font-bold text-[#475569]/50 tracking-widest">{step}/{totalSteps}</div>
+        {step < totalSteps ? (
+          <button 
+            type="button" 
+            onClick={handleNext}
+            disabled={!isComplete}
+            className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${isComplete ? 'primary-btn shadow-lg' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+          >
+            Next
+          </button>
+        ) : (
+          <button 
+            type="button" 
+            onClick={() => handleLocalSubmit()}
+            disabled={!isComplete}
+            className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${isComplete ? 'primary-btn shadow-lg shadow-[#1918f0]/20' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+          >
+            Start Building
+          </button>
+        )}
       </div>
-      <div className="space-y-1">
-        <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Target Company</label>
-        <input type="text" value={covCompany} onChange={(e) => setCovCompany(e.target.value)} placeholder="e.g. Acme Corp" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1918f0]/10 focus:border-[#1918f0] transition-all text-black" required />
-      </div>
-      <div className="space-y-1">
-        <label className="text-[10px] font-bold uppercase text-[#64748b] ml-1">Key Strength</label>
-        <SuggestionChips suggestions={suggestions} selected={covStrength} onSelect={setCovStrength} />
-      </div>
-      <button type="submit" className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${covRole && covCompany && covStrength ? 'primary-btn shadow-lg shadow-[#1918f0]/20' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}>
-        Start Building
-      </button>
-    </form>
+    </div>
   );
 };
 
@@ -308,11 +297,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (parsed.length > 0) {
-          setMessages(parsed);
-        } else {
-          setMessages([{ role: 'assistant', content: getInitialMessage() }]);
-        }
+        setMessages(parsed.length > 0 ? parsed : [{ role: 'assistant', content: getInitialMessage() }]);
       } catch (e) {
         setMessages([{ role: 'assistant', content: getInitialMessage() }]);
       }
@@ -332,6 +317,14 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, isLoading, stagedFiles]);
+
+  const handleReset = () => {
+    if (confirm("Reset conversation? This will clear current history.")) {
+      const resetMsg = [{ role: 'assistant' as const, content: getInitialMessage() }];
+      setMessages(resetMsg);
+      localStorage.setItem(`zysculpt_chat_${mode}`, JSON.stringify(resetMsg));
+    }
+  };
 
   const handleDownload = (format: 'pdf' | 'docx') => {
     const lastAiMessage = [...messages].reverse().find(m => m.role === 'assistant')?.content || '';
@@ -412,13 +405,20 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
       <div className="bg-[#1918f0] p-4 flex items-center justify-between flex-shrink-0 relative rounded-t-3xl">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-            <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L14.5 8.5L20 11L14.5 13.5L12 19L9.5 13.5L4 11L9.5 8.5L12 3Z"></path></svg>
+            {HEADER_ICON}
           </div>
           <div>
             <h3 className="text-white font-bold text-lg leading-tight capitalize tracking-tight">{mode.replace('_', ' ')}</h3>
             <p className="text-white/70 text-[10px] font-semibold">Architecting your future</p>
           </div>
         </div>
+        <button 
+          onClick={handleReset}
+          className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all"
+          title="Reset conversation"
+        >
+          {RESET_ICON}
+        </button>
       </div>
 
       {/* Messages */}
@@ -428,7 +428,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
           const isResignationDoc = isDoc && mode === 'resignation';
           return (
             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed ${m.role === 'user' ? 'bg-[#1918f0] text-white rounded-tr-none shadow-md' : 'bg-white text-black rounded-tl-none border border-gray-100 shadow-sm'}`}>
+              <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed ${m.role === 'user' ? 'bg-[#1918f0] text-white rounded-tr-none shadow-md' : 'bg-white text-[#110584] rounded-tl-none border border-gray-100 shadow-sm'}`}>
                 {m.files && m.files.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-2">
                     {m.files.map((f, idx) => <div key={idx} className="w-40 flex-shrink-0"><FileBadge file={f} variant={m.role === 'user' ? 'bubble' : 'preview'} /></div>)}
@@ -454,7 +454,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
               <div className="w-1.5 h-1.5 bg-[#1918f0] rounded-full animate-bounce"></div>
               <div className="w-1.5 h-1.5 bg-[#1918f0] rounded-full animate-bounce [animation-delay:0.2s]"></div>
               <div className="w-1.5 h-1.5 bg-[#1918f0] rounded-full animate-bounce [animation-delay:0.4s]"></div>
-              <span className="text-[10px] text-[#64748b] font-bold ml-2 uppercase tracking-widest">Architecting</span>
+              <span className="text-[10px] text-[#475569] font-bold ml-2 uppercase tracking-widest">Architecting</span>
             </div>
           </div>
         )}
@@ -469,18 +469,18 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
         )}
         <form onSubmit={handleSubmit} className="relative flex items-center">
           <Tooltip text="Upload File">
-            <button type="button" onClick={() => fileInputRef.current?.click()} className="absolute left-2.5 p-1.5 rounded-full text-[#64748b] hover:text-[#1918f0] hover:bg-[#1918f0]/5 transition-all">
+            <button type="button" onClick={() => fileInputRef.current?.click()} className="absolute left-2.5 p-1.5 rounded-full text-[#475569] hover:text-[#1918f0] hover:bg-[#1918f0]/5 transition-all">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
             </button>
           </Tooltip>
-          <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type or paste to refine..." className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3.5 pl-12 pr-12 text-sm focus:outline-none focus:ring-4 focus:ring-[#1918f0]/5 focus:border-[#1918f0] transition-all text-[#0f172a]" />
+          <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type or paste to refine..." className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3.5 pl-12 pr-12 text-sm focus:outline-none focus:ring-4 focus:ring-[#1918f0]/5 focus:border-[#1918f0] transition-all text-[#110584]" />
           <Tooltip text="Send Message">
             <button type="submit" disabled={(!input.trim() && stagedFiles.length === 0) || isLoading} className={`absolute right-2.5 p-1.5 rounded-full text-white transition-all ${((!input.trim() && stagedFiles.length === 0) || isLoading) ? 'bg-gray-200 cursor-not-allowed' : 'bg-[#1918f0] hover:bg-[#1312cc] active:scale-95 shadow-lg shadow-[#1918f0]/20'}`}>
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 16V8M8 12l4-4 4 4"/></svg>
             </button>
           </Tooltip>
         </form>
-        <p className="text-[9px] text-center text-[#64748b] mt-2 font-medium tracking-tight">Zysculpt can make mistakes. Check important information.</p>
+        <p className="text-[9px] text-center text-[#475569]/60 mt-2 font-medium tracking-tight">Zysculpt can make mistakes. Check important information.</p>
       </div>
     </div>
   );
