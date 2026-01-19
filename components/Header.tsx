@@ -11,23 +11,39 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
   const navData = [
     {
       label: 'Resume',
-      items: ['AI Resume Builder', 'ATS Scorer', 'Resume Examples', 'Resume Templates']
+      items: [
+        { label: 'AI Resume Builder', mode: 'resume' },
+        { label: 'ATS Scorer', path: 'https://app.zysculpt.com' },
+        { label: 'Resume Examples', path: 'https://app.zysculpt.com' },
+        { label: 'Resume Templates', path: 'https://app.zysculpt.com' }
+      ]
     },
     {
       label: 'Cover Letter',
-      items: ['AI Cover Letter Builder', 'Cover Letter Examples', 'Cover Letter Templates']
+      items: [
+        { label: 'AI Cover Letter Builder', mode: 'cover_letter' },
+        { label: 'Cover Letter Examples', path: 'https://app.zysculpt.com' },
+        { label: 'Cover Letter Templates', path: 'https://app.zysculpt.com' }
+      ]
     },
     {
       label: 'Resignation Letter',
-      items: ['AI Resignation Letter Builder', 'Resignation Letter Examples', 'Resignation Letter Templates']
+      items: [
+        { label: 'AI Resignation Letter Builder', mode: 'resignation' },
+        { label: 'Resignation Letter Examples', path: 'https://app.zysculpt.com' },
+        { label: 'Resignation Letter Templates', path: 'https://app.zysculpt.com' }
+      ]
     }
   ];
 
-  const handleNavClick = (item: string) => {
-    if (item === 'AI Resume Builder') onNavigate('resume');
-    else if (item === 'AI Cover Letter Builder') onNavigate('cover_letter');
-    else if (item === 'AI Resignation Letter Builder') onNavigate('resignation');
-    setIsMobileMenuOpen(false);
+  const handleItemClick = (label: string, category: any) => {
+    const item = category.items.find((i: any) => i.label === label);
+    if (item.mode) {
+      onNavigate(item.mode);
+      setIsMobileMenuOpen(false);
+    } else if (item.path) {
+      window.location.href = item.path;
+    }
   };
 
   return (
@@ -35,19 +51,24 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <div className="flex items-center group cursor-pointer" onClick={() => onNavigate('resume')}>
+          <button onClick={() => onNavigate('resume')} className="flex items-center group cursor-pointer focus:outline-none">
             <img 
               src="https://res.cloudinary.com/dqhawdcol/image/upload/v1768764769/gyemhl4rh70wly1hm0zi.svg" 
               className="w-10 h-10 transition-transform group-hover:rotate-12" 
               alt="Zysculpt Logo" 
             />
             <span className="ml-2 text-2xl font-bold lowercase text-[#1918f0] tracking-tighter">zysculpt</span>
-          </div>
+          </button>
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-4">
             {navData.map((nav, index) => (
-              <Dropdown key={index} label={nav.label} items={nav.items} onItemClick={handleNavClick} />
+              <Dropdown 
+                key={index} 
+                label={nav.label} 
+                items={nav.items.map(i => i.label)} 
+                onItemClick={(label) => handleItemClick(label, nav)} 
+              />
             ))}
           </nav>
 
@@ -95,10 +116,10 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                 {nav.items.map((item, idx) => (
                   <button 
                     key={idx} 
-                    onClick={() => handleNavClick(item)} 
+                    onClick={() => handleItemClick(item.label, nav)}
                     className="py-2 text-sm text-left text-[#110584]/60 hover:text-[#1918f0] tracking-tight"
                   >
-                    {item}
+                    {item.label}
                   </button>
                 ))}
               </div>
