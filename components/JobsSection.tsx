@@ -47,7 +47,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({ label, options, selecte
 
       {isOpen && (
         <div className="absolute left-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30 animate-in fade-in slide-in-from-top-2">
-          <div className="max-h-60 overflow-y-auto no-scrollbar py-2">
+          <div className="max-h-60 overflow-y-auto custom-scrollbar py-2">
             {options.map((option) => (
               <button
                 key={option}
@@ -85,6 +85,7 @@ const JobCard: React.FC<{ job: any }> = ({ job }) => (
     
     <div className="flex flex-wrap gap-2 mb-6 mt-auto">
       <span className="px-3 py-1 bg-gray-50 text-[#110584]/60 rounded-lg text-xs font-bold">{job.location}</span>
+      <span className="px-3 py-1 bg-gray-50 text-[#110584]/60 rounded-lg text-xs font-bold">{job.type}</span>
       <span className="px-3 py-1 bg-gray-50 text-[#110584]/60 rounded-lg text-xs font-bold">{job.experience}</span>
       <span className="px-3 py-1 bg-gray-50 text-[#110584]/60 rounded-lg text-xs font-bold">{job.salary}</span>
     </div>
@@ -100,18 +101,21 @@ const JobsSection: React.FC = () => {
   const [experience, setExperience] = useState('All');
   const [industry, setIndustry] = useState('All');
   const [role, setRole] = useState('All');
+  const [type, setType] = useState('All');
 
-  const locations = ['All', 'Remote', 'New York', 'San Francisco', 'London', 'Berlin', 'Austin'];
+  const locations = ['All', 'USA', 'UK', 'Canada', 'Germany', 'India', 'France', 'Spain', 'Australia', 'Brazil', 'Japan'];
   const experiences = ['All', 'Entry Level', 'Mid Level', 'Senior Level', 'Lead'];
-  const industries = ['All', 'Technology', 'Finance', 'Healthcare', 'E-commerce', 'SaaS'];
-  const roles = ['All', 'Frontend Engineer', 'Backend Engineer', 'Product Manager', 'UX Designer', 'Marketing Lead'];
+  const industries = ['All', 'Technology', 'Finance', 'Healthcare', 'E-commerce', 'SaaS', 'Marketing', 'Consulting', 'Education'];
+  const roles = ['All', 'Frontend Engineer', 'Backend Engineer', 'Product Manager', 'UX Designer', 'Marketing Lead', 'Data Scientist', 'Sales Executive'];
+  const types = ['All', 'Remote', 'Onsite', 'Hybrid'];
 
   const jobs = [
     {
       title: "Senior Frontend Engineer",
       company: "Linear",
       logo: "https://upload.wikimedia.org/wikipedia/commons/e/e8/Linear_logo.svg",
-      location: "Remote",
+      location: "USA",
+      type: "Remote",
       experience: "Senior",
       salary: "$160k - $210k",
       industry: "Technology"
@@ -120,7 +124,8 @@ const JobsSection: React.FC = () => {
       title: "Product Designer",
       company: "Stripe",
       logo: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg",
-      location: "San Francisco",
+      location: "USA",
+      type: "Hybrid",
       experience: "Mid Level",
       salary: "$140k - $190k",
       industry: "Finance"
@@ -129,7 +134,8 @@ const JobsSection: React.FC = () => {
       title: "Backend Engineer (Go)",
       company: "PostHog",
       logo: "https://posthog.com/brand/posthog-logo.svg",
-      location: "Remote",
+      location: "UK",
+      type: "Remote",
       experience: "Senior",
       salary: "$150k - $200k",
       industry: "Technology"
@@ -138,7 +144,8 @@ const JobsSection: React.FC = () => {
       title: "Marketing Manager",
       company: "Loom",
       logo: "https://upload.wikimedia.org/wikipedia/commons/d/de/Loom_Logo.svg",
-      location: "London",
+      location: "UK",
+      type: "Onsite",
       experience: "Mid Level",
       salary: "£60k - £85k",
       industry: "SaaS"
@@ -147,7 +154,8 @@ const JobsSection: React.FC = () => {
       title: "Engineering Lead",
       company: "Vercel",
       logo: "https://assets.vercel.com/image/upload/front/favicon/vercel/180x180.png",
-      location: "Remote",
+      location: "Germany",
+      type: "Remote",
       experience: "Lead",
       salary: "$200k - $280k",
       industry: "Technology"
@@ -156,7 +164,8 @@ const JobsSection: React.FC = () => {
       title: "Data Analyst",
       company: "Healthcare Inc",
       logo: "https://www.gstatic.com/images/branding/product/2x/healthcare_64dp.png",
-      location: "New York",
+      location: "USA",
+      type: "Onsite",
       experience: "Entry Level",
       salary: "$90k - $120k",
       industry: "Healthcare"
@@ -167,6 +176,7 @@ const JobsSection: React.FC = () => {
     return (location === 'All' || job.location === location) &&
            (experience === 'All' || job.experience === experience || (experience === 'Entry Level' && job.experience === 'Entry Level')) &&
            (industry === 'All' || job.industry === industry) &&
+           (type === 'All' || job.type === type) &&
            (role === 'All' || job.title.toLowerCase().includes(role.toLowerCase()));
   });
 
@@ -184,6 +194,7 @@ const JobsSection: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <FilterDropdown label="Type" options={types} selected={type} onSelect={setType} />
             <FilterDropdown label="Location" options={locations} selected={location} onSelect={setLocation} />
             <FilterDropdown label="Experience" options={experiences} selected={experience} onSelect={setExperience} />
             <FilterDropdown label="Industry" options={industries} selected={industry} onSelect={setIndustry} />

@@ -10,17 +10,29 @@ const Hero: React.FC<HeroProps> = ({ mode }) => {
     switch(mode) {
       case 'cover_letter':
         return {
-          title: "The AI cover letter builder that makes you stand out.",
+          title: (
+            <>
+              The AI cover letter builder that makes you <span className="animate-highlight">stand out</span>.
+            </>
+          ),
           desc: "Zysculpt crafts persuasive cover letters that highlight your unique value and land you more interviews."
         };
       case 'resignation':
         return {
-          title: "The AI resignation letter builder for a graceful exit.",
+          title: (
+            <>
+              The AI resignation letter builder for a graceful <span className="animate-highlight">exit</span>.
+            </>
+          ),
           desc: "Exit with confidence and professionalism. Zysculpt helps you maintain positive relationships during career transitions."
         };
       default:
         return {
-          title: "The AI resume builder that helps you get hired at your dream job.",
+          title: (
+            <>
+              The AI resume builder that helps you get <span className="animate-highlight">hired</span>.
+            </>
+          ),
           desc: "Zysculpt turns your experience and any job description into a resume recruiters want to read."
         };
     }
