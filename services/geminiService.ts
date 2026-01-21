@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `You are Zysculpt's Expert AI Career Architect. 
 Your goal is to build and refine ATS-optimized career documents (Resumes, Cover Letters, or Resignation Letters).
@@ -21,6 +21,21 @@ Guidelines:
 4. Ask a follow-up or a new question.
 5. Keep the tone professional and encouraging.
 6. Always end your message with a question for the candidate.`;
+
+const ATS_SCORER_SYSTEM_INSTRUCTION = `You are an expert ATS (Applicant Tracking System) Analyst. 
+Analyze the provided resume against the given job description. 
+Provide a comprehensive analysis in JSON format.
+The analysis must include:
+- overallScore: (0-100)
+- formattingScore: (0-100)
+- keywordScore: (0-100)
+- findings: {
+    matchingKeywords: string[],
+    missingKeywords: string[],
+    formattingIssues: string[],
+    improvementSuggestions: string[]
+  }
+- summary: A brief encouraging summary of the fit.`;
 
 export interface MediaPart {
   data: string;
@@ -77,5 +92,60 @@ export const getMockInterviewResponse = async (history: { role: 'user' | 'assist
   } catch (error) {
     console.error("Gemini API Error:", error);
     return "I'm having a bit of trouble connecting to our systems. Could you repeat that?";
+  }
+};
+
+export const analyzeAtsScore = async (resumeText: string, jobDescription: string, resumeFiles?: MediaPart[]) => {
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    
+    const prompt = `RESUME CONTENT:\n${resumeText}\n\nJOB DESCRIPTION:\n${jobDescription}`;
+    
+    const parts: any[] = [{ text: prompt }];
+    if (resumeFiles && resumeFiles.length > 0) {
+      resumeFiles.forEach(f => {
+        parts.push({
+          inlineData: {
+            data: f.data,
+            mimeType: f.mimeType
+          }
+        });
+      });
+    }
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: [{ parts }],
+      config: {
+        systemInstruction: ATS_SCORER_SYSTEM_INSTRUCTION,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            overallScore: { type: Type.NUMBER },
+            formattingScore: { type: Type.NUMBER },
+            keywordScore: { type: Type.NUMBER },
+            findings: {
+              type: Type.OBJECT,
+              properties: {
+                matchingKeywords: { type: Type.ARRAY, items: { type: Type.STRING } },
+                missingKeywords: { type: Type.ARRAY, items: { type: Type.STRING } },
+                formattingIssues: { type: Type.ARRAY, items: { type: Type.STRING } },
+                improvementSuggestions: { type: Type.ARRAY, items: { type: Type.STRING } },
+              },
+              required: ["matchingKeywords", "missingKeywords", "formattingIssues", "improvementSuggestions"]
+            },
+            summary: { type: Type.STRING }
+          },
+          required: ["overallScore", "formattingScore", "keywordScore", "findings", "summary"]
+        }
+      },
+    });
+
+    const result = JSON.parse(response.text);
+    return result;
+  } catch (error) {
+    console.error("ATS Analysis Error:", error);
+    throw error;
   }
 };

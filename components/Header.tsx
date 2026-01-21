@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Dropdown from './Dropdown.tsx';
 
 interface HeaderProps {
-  onNavigate: (mode: 'resume' | 'cover_letter' | 'resignation') => void;
+  onNavigate: (mode: 'resume' | 'cover_letter' | 'resignation' | 'ats_scorer') => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
@@ -13,7 +13,7 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
       label: 'Resume',
       items: [
         { label: 'AI Resume Builder', mode: 'resume' },
-        { label: 'ATS Scorer', path: 'https://app.zysculpt.com' },
+        { label: 'ATS Scorer', mode: 'ats_scorer' },
         { label: 'Resume Examples', path: 'https://app.zysculpt.com' },
         { label: 'Resume Templates', scrollTo: 'resume-templates' }
       ]

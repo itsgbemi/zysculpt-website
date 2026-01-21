@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface FooterProps {
-  onNavigate: (mode: 'resume' | 'cover_letter' | 'resignation' | 'interview_prep' | 'jobs') => void;
+  onNavigate: (mode: 'resume' | 'cover_letter' | 'resignation' | 'interview_prep' | 'jobs' | 'ats_scorer') => void;
 }
 
 const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
@@ -12,7 +12,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       title: 'Resume',
       links: [
         { label: 'AI Resume Builder', mode: 'resume' },
-        { label: 'ATS Scorer', path: 'https://app.zysculpt.com' },
+        { label: 'ATS Scorer', mode: 'ats_scorer' },
         { label: 'Resume Examples', path: 'https://app.zysculpt.com' },
         { label: 'Resume Templates', scrollTo: 'resume-templates' }
       ]

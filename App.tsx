@@ -4,9 +4,10 @@ import Hero from './components/Hero.tsx';
 import ResumeTemplatesSection from './components/ResumeTemplatesSection.tsx';
 import InterviewPrep from './components/InterviewPrep.tsx';
 import JobsSection from './components/JobsSection.tsx';
+import AtsScorer from './components/AtsScorer.tsx';
 import Footer from './components/Footer.tsx';
 
-type Mode = 'resume' | 'cover_letter' | 'resignation' | 'interview_prep' | 'jobs';
+type Mode = 'resume' | 'cover_letter' | 'resignation' | 'interview_prep' | 'jobs' | 'ats_scorer';
 
 const App: React.FC = () => {
   // Helper to get mode from current URL hash
@@ -17,6 +18,7 @@ const App: React.FC = () => {
       if (hash === 'resignation') return 'resignation';
       if (hash === 'interview-prep') return 'interview_prep';
       if (hash === 'jobs') return 'jobs';
+      if (hash === 'ats-scorer') return 'ats_scorer';
     } catch (e) {
       console.warn("Unable to access window.location.hash");
     }
@@ -36,6 +38,7 @@ const App: React.FC = () => {
 
   const navItems: { label: string; value: Mode; hash: string }[] = [
     { label: 'For resume', value: 'resume', hash: '#resume' },
+    { label: 'ATS Scorer', value: 'ats_scorer', hash: '#ats-scorer' },
     { label: 'For cover letter', value: 'cover_letter', hash: '#cover-letter' },
     { label: 'For resignation', value: 'resignation', hash: '#resignation' },
     { label: 'Interview Prep', value: 'interview_prep', hash: '#interview-prep' },
@@ -51,7 +54,8 @@ const App: React.FC = () => {
                    newMode === 'cover_letter' ? '#cover-letter' : 
                    newMode === 'resignation' ? '#resignation' :
                    newMode === 'interview_prep' ? '#interview-prep' :
-                   '#jobs';
+                   newMode === 'jobs' ? '#jobs' :
+                   '#ats-scorer';
     
     try {
       // Use pushState instead of location.hash setter to avoid "Access Denied" on blob origins
@@ -96,6 +100,8 @@ const App: React.FC = () => {
           <InterviewPrep />
         ) : mode === 'jobs' ? (
           <JobsSection />
+        ) : mode === 'ats_scorer' ? (
+          <AtsScorer />
         ) : (
           <>
             <Hero mode={mode} />
