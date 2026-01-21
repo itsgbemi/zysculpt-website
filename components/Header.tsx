@@ -15,7 +15,7 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
         { label: 'AI Resume Builder', mode: 'resume' },
         { label: 'ATS Scorer', path: 'https://app.zysculpt.com' },
         { label: 'Resume Examples', path: 'https://app.zysculpt.com' },
-        { label: 'Resume Templates', path: 'https://app.zysculpt.com' }
+        { label: 'Resume Templates', scrollTo: 'resume-templates' }
       ]
     },
     {
@@ -38,7 +38,11 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
 
   const handleItemClick = (label: string, category: any) => {
     const item = category.items.find((i: any) => i.label === label);
-    if (item.mode) {
+    if (item.scrollTo) {
+      const el = document.getElementById(item.scrollTo);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      setIsMobileMenuOpen(false);
+    } else if (item.mode) {
       onNavigate(item.mode);
       setIsMobileMenuOpen(false);
     } else if (item.path) {

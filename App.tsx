@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header.tsx';
 import Hero from './components/Hero.tsx';
+import ResumeTemplatesSection from './components/ResumeTemplatesSection.tsx';
+import InterviewPrep from './components/InterviewPrep.tsx';
 import Footer from './components/Footer.tsx';
 
-type Mode = 'resume' | 'cover_letter' | 'resignation';
+type Mode = 'resume' | 'cover_letter' | 'resignation' | 'interview_prep';
 
 const App: React.FC = () => {
   // Helper to get mode from current URL hash
   const getModeFromHash = (): Mode => {
-    const hash = window.location.hash.replace('#', '');
-    if (hash === 'cover-letter') return 'cover_letter';
-    if (hash === 'resignation') return 'resignation';
+    try {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'cover-letter') return 'cover_letter';
+      if (hash === 'resignation') return 'resignation';
+      if (hash === 'interview-prep') return 'interview_prep';
+    } catch (e) {
+      console.warn("Unable to access window.location.hash");
+    }
     return 'resume';
   };
 
@@ -28,16 +35,27 @@ const App: React.FC = () => {
   const navItems: { label: string; value: Mode; hash: string }[] = [
     { label: 'For resume', value: 'resume', hash: '#resume' },
     { label: 'For cover letter', value: 'cover_letter', hash: '#cover-letter' },
-    { label: 'For resignation', value: 'resignation', hash: '#resignation' }
+    { label: 'For resignation', value: 'resignation', hash: '#resignation' },
+    { label: 'Interview Prep', value: 'interview_prep', hash: '#interview-prep' }
   ];
 
   const handleNavigate = (newMode: Mode) => {
+    // 1. Update React state immediately for responsiveness
+    setMode(newMode);
+    
+    // 2. Safely attempt to update the URL for deep-linking
     const newHash = newMode === 'resume' ? '#resume' : 
                    newMode === 'cover_letter' ? '#cover-letter' : 
-                   '#resignation';
+                   newMode === 'resignation' ? '#resignation' :
+                   '#interview-prep';
     
-    // This will trigger the hashchange listener
-    window.location.hash = newHash;
+    try {
+      // Use pushState instead of location.hash setter to avoid "Access Denied" on blob origins
+      window.history.pushState(null, '', newHash);
+    } catch (e) {
+      console.warn("Browser denied script-based URL update. Deep linking might not work in this environment.", e);
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -70,7 +88,14 @@ const App: React.FC = () => {
       </nav>
 
       <main className="flex-1">
-        <Hero mode={mode} />
+        {mode === 'interview_prep' ? (
+          <InterviewPrep />
+        ) : (
+          <>
+            <Hero mode={mode} />
+            {mode === 'resume' && <ResumeTemplatesSection />}
+          </>
+        )}
       </main>
       <Footer onNavigate={handleNavigate} />
     </div>

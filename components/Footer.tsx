@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface FooterProps {
-  onNavigate: (mode: 'resume' | 'cover_letter' | 'resignation') => void;
+  onNavigate: (mode: 'resume' | 'cover_letter' | 'resignation' | 'interview_prep') => void;
 }
 
 const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
@@ -14,7 +14,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         { label: 'AI Resume Builder', mode: 'resume' },
         { label: 'ATS Scorer', path: 'https://app.zysculpt.com' },
         { label: 'Resume Examples', path: 'https://app.zysculpt.com' },
-        { label: 'Resume Templates', path: 'https://app.zysculpt.com' }
+        { label: 'Resume Templates', scrollTo: 'resume-templates' }
       ]
     },
     {
@@ -34,15 +34,27 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       ]
     },
     {
-      title: 'Company',
+      title: 'Resources',
       links: [
-        { label: 'About Us', path: '#' },
-        { label: 'Contact Us', path: '#' },
+        { label: 'Interview Prep', mode: 'interview_prep' },
+        { label: 'Career Blog', path: '#' },
         { label: 'Privacy Policy', path: 'https://app.zysculpt.com' },
         { label: 'Terms of Service', path: 'https://app.zysculpt.com' }
       ]
     }
   ];
+
+  const handleLinkClick = (link: any) => {
+    if (link.scrollTo) {
+      const el = document.getElementById(link.scrollTo);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    } else if (link.mode) {
+      onNavigate(link.mode);
+    } else if (link.path) {
+      if (link.path === '#') return;
+      window.location.href = link.path;
+    }
+  };
 
   return (
     <footer className="bg-white border-t border-gray-100 font-['Work_Sans']">
@@ -57,21 +69,12 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <ul className="space-y-4">
                 {column.links.map((link, linkIdx) => (
                   <li key={linkIdx}>
-                    {link.mode ? (
-                      <button 
-                        onClick={() => onNavigate(link.mode as any)}
-                        className="text-[#110584]/60 hover:text-[#1918f0] text-sm transition-colors tracking-tight text-left"
-                      >
-                        {link.label}
-                      </button>
-                    ) : (
-                      <a 
-                        href={link.path}
-                        className="text-[#110584]/60 hover:text-[#1918f0] text-sm transition-colors tracking-tight"
-                      >
-                        {link.label}
-                      </a>
-                    )}
+                    <button 
+                      onClick={() => handleLinkClick(link)}
+                      className="text-[#110584]/60 hover:text-[#1918f0] text-sm transition-colors tracking-tight text-left"
+                    >
+                      {link.label}
+                    </button>
                   </li>
                 ))}
               </ul>
