@@ -52,15 +52,16 @@ const AtsScorer: React.FC = () => {
         })
       );
 
-      // Combine text and media context
+      const combinedText = `RESUME CONTENT:\n${resumeText}\n\nJOB DESCRIPTION:\n${jobDescription}`;
       const analysis = await analyzeAtsScore(
-        `RESUME:\n${resumeText}\n\nJOB:\n${jobDescription}`,
-        "Combined analysis request",
+        combinedText,
+        "Analyze the provided resume against the job description.",
         [...jdMediaParts, ...resumeMediaParts]
       );
       setResults(analysis);
       setStep(4);
     } catch (err) {
+      console.error(err);
       alert("Analysis failed. Please try again.");
     } finally {
       setIsLoading(false);
@@ -107,21 +108,18 @@ const AtsScorer: React.FC = () => {
     </div>
   );
 
-  const ChoiceCard = ({ icon, label, sublabel, active, onClick }: any) => (
+  const ChoiceOption = ({ label, active, onClick }: any) => (
     <button
       onClick={onClick}
-      className={`flex-1 p-8 rounded-3xl border-2 transition-all text-left space-y-4 ${
+      className={`w-full flex items-center gap-4 p-5 rounded-2xl border transition-all text-left ${
         active 
-        ? 'border-[#1918f0] bg-[#1918f0]/5 shadow-xl shadow-[#1918f0]/5' 
+        ? 'border-[#1918f0] bg-[#1918f0]/5' 
         : 'border-gray-100 bg-white hover:border-[#1918f0]/30 hover:bg-gray-50'
       }`}
     >
-      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${active ? 'bg-[#1918f0] text-white' : 'bg-gray-100 text-[#110584]/40'}`}>
-        {icon}
-      </div>
-      <div>
-        <h4 className="font-bold text-[#110584]">{label}</h4>
-        <p className="text-xs text-[#110584]/40 font-medium">{sublabel}</p>
+      <span className={`flex-1 font-normal transition-colors ${active ? 'text-[#1918f0]' : 'text-[#110584]'}`}>{label}</span>
+      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${active ? 'border-[#1918f0] bg-[#1918f0]' : 'border-gray-200'}`}>
+        {active && <div className="w-2 h-2 bg-white rounded-full" />}
       </div>
     </button>
   );
@@ -139,6 +137,15 @@ const AtsScorer: React.FC = () => {
     }
     return false;
   };
+
+  const ChevronIcon = ({ expanded }: { expanded: boolean }) => (
+    <svg 
+      className={`w-4 h-4 text-[#110584]/40 transition-transform duration-300 ${expanded ? 'rotate-0' : '-rotate-90'}`} 
+      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+    </svg>
+  );
 
   return (
     <div className="bg-white font-['Inter Tight'] min-h-screen">
@@ -161,92 +168,112 @@ const AtsScorer: React.FC = () => {
         <div className="bg-white rounded-[40px] border border-gray-100 shadow-2xl overflow-hidden min-h-[500px] flex flex-col">
           <div className="p-10 flex-1">
             {step === 1 && (
-              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-bold text-[#110584]">Target Job</h2>
-                  <p className="text-[#110584]/60">How would you like to share the job description?</p>
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3">
+                  <ChevronIcon expanded={!jdInputType} />
+                  <h2 className="text-lg font-semibold text-[#110584]">How would you like to provide the Job Description?</h2>
+                  {jdInputType && (
+                    <button 
+                      onClick={() => { setJdInputType(null); setJobDescription(''); setJdFiles([]); }} 
+                      className="ml-auto text-xs font-bold text-[#1918f0] hover:underline"
+                    >
+                      Change method
+                    </button>
+                  )}
                 </div>
                 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <ChoiceCard 
-                    label="Paste Text"
-                    sublabel="Copy-paste job requirements"
-                    active={jdInputType === 'text'}
-                    onClick={() => setJdInputType('text')}
-                    icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>}
-                  />
-                  <ChoiceCard 
-                    label="Upload File"
-                    sublabel="Screenshot, PDF, or Word"
-                    active={jdInputType === 'file'}
-                    onClick={() => setJdInputType('file')}
-                    icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
-                  />
-                </div>
-
-                {jdInputType === 'text' && (
-                  <textarea
-                    value={jobDescription}
-                    onChange={(e) => setJobDescription(e.target.value)}
-                    placeholder="Paste job details here..."
-                    className="w-full h-48 bg-gray-50 border border-gray-200 rounded-3xl p-6 text-sm focus:outline-none focus:border-[#1918f0] animate-in fade-in slide-in-from-top-2"
-                  />
-                )}
-
-                {jdInputType === 'file' && (
-                  <div 
-                    onClick={() => jdFileInputRef.current?.click()}
-                    className="border-2 border-dashed border-gray-200 rounded-3xl p-12 text-center cursor-pointer hover:border-[#1918f0]/50 hover:bg-[#1918f0]/5 transition-all animate-in fade-in slide-in-from-top-2"
-                  >
-                    <input type="file" ref={jdFileInputRef} className="hidden" onChange={(e) => setJdFiles(Array.from(e.target.files || []))} accept="image/*,.pdf,.doc,.docx,.txt" />
-                    <h4 className="font-bold text-[#110584] mb-2">{jdFiles.length > 0 ? jdFiles[0].name : "Click to upload job context"}</h4>
-                    <p className="text-xs text-[#110584]/40 uppercase tracking-widest font-bold">Screenshots supported</p>
+                {!jdInputType ? (
+                  <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
+                    <ChoiceOption 
+                      label="Paste Job Text"
+                      active={jdInputType === 'text'}
+                      onClick={() => setJdInputType('text')}
+                    />
+                    <ChoiceOption 
+                      label="Upload Job File (PDF/DOCX/Image)"
+                      active={jdInputType === 'file'}
+                      onClick={() => setJdInputType('file')}
+                    />
+                  </div>
+                ) : (
+                  <div className="animate-in fade-in zoom-in duration-300">
+                    {jdInputType === 'text' && (
+                      <textarea
+                        value={jobDescription}
+                        onChange={(e) => setJobDescription(e.target.value)}
+                        placeholder="Paste job details here..."
+                        className="w-full h-64 bg-gray-50 border border-gray-200 rounded-3xl p-6 text-sm focus:outline-none focus:border-[#1918f0] transition-all"
+                      />
+                    )}
+                    {jdInputType === 'file' && (
+                      <div 
+                        onClick={() => jdFileInputRef.current?.click()}
+                        className="border-2 border-dashed border-gray-200 rounded-3xl p-16 text-center cursor-pointer hover:border-[#1918f0]/50 hover:bg-[#1918f0]/5 transition-all"
+                      >
+                        <input type="file" ref={jdFileInputRef} className="hidden" onChange={(e) => setJdFiles(Array.from(e.target.files || []))} accept="image/*,.pdf,.doc,.docx,.txt" />
+                        <div className="w-16 h-16 bg-[#1918f0]/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                          <svg className="w-8 h-8 text-[#1918f0]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                        </div>
+                        <h4 className="font-bold text-[#110584] mb-2">{jdFiles.length > 0 ? jdFiles[0].name : "Select job description file"}</h4>
+                        <p className="text-xs text-[#110584]/40 uppercase tracking-widest font-bold">PDF, DOCX, or Image</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             )}
 
             {step === 2 && (
-              <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-bold text-[#110584]">Your Resume</h2>
-                  <p className="text-[#110584]/60">Choose your preferred way to provide your resume.</p>
+              <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="flex items-center gap-3">
+                  <ChevronIcon expanded={!resumeInputType} />
+                  <h2 className="text-lg font-semibold text-[#110584]">How would you like to provide your Resume?</h2>
+                  {resumeInputType && (
+                    <button 
+                      onClick={() => { setResumeInputType(null); setResumeText(''); setResumeFiles([]); }} 
+                      className="ml-auto text-xs font-bold text-[#1918f0] hover:underline"
+                    >
+                      Change method
+                    </button>
+                  )}
                 </div>
                 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <ChoiceCard 
-                    label="Paste Text"
-                    sublabel="Copy-paste your CV content"
-                    active={resumeInputType === 'text'}
-                    onClick={() => setResumeInputType('text')}
-                    icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>}
-                  />
-                  <ChoiceCard 
-                    label="Upload File"
-                    sublabel="PDF or Word document"
-                    active={resumeInputType === 'file'}
-                    onClick={() => setResumeInputType('file')}
-                    icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>}
-                  />
-                </div>
-
-                {resumeInputType === 'text' && (
-                  <textarea
-                    value={resumeText}
-                    onChange={(e) => setResumeText(e.target.value)}
-                    placeholder="Paste resume content here..."
-                    className="w-full h-48 bg-gray-50 border border-gray-200 rounded-3xl p-6 text-sm focus:outline-none focus:border-[#1918f0] animate-in fade-in slide-in-from-top-2"
-                  />
-                )}
-
-                {resumeInputType === 'file' && (
-                  <div 
-                    onClick={() => resumeFileInputRef.current?.click()}
-                    className="border-2 border-dashed border-gray-200 rounded-3xl p-12 text-center cursor-pointer hover:border-[#1918f0]/50 hover:bg-[#1918f0]/5 transition-all animate-in fade-in slide-in-from-top-2"
-                  >
-                    <input type="file" ref={resumeFileInputRef} className="hidden" onChange={(e) => setResumeFiles(Array.from(e.target.files || []))} accept=".pdf,.doc,.docx,.txt" />
-                    <h4 className="font-bold text-[#110584] mb-2">{resumeFiles.length > 0 ? resumeFiles[0].name : "Upload your resume file"}</h4>
-                    <p className="text-xs text-[#110584]/40 uppercase tracking-widest font-bold">Standard formats only</p>
+                {!resumeInputType ? (
+                  <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
+                    <ChoiceOption 
+                      label="Paste Resume Text"
+                      active={resumeInputType === 'text'}
+                      onClick={() => setResumeInputType('text')}
+                    />
+                    <ChoiceOption 
+                      label="Upload Resume File (PDF/DOCX)"
+                      active={resumeInputType === 'file'}
+                      onClick={() => setResumeInputType('file')}
+                    />
+                  </div>
+                ) : (
+                  <div className="animate-in fade-in zoom-in duration-300">
+                    {resumeInputType === 'text' && (
+                      <textarea
+                        value={resumeText}
+                        onChange={(e) => setResumeText(e.target.value)}
+                        placeholder="Paste resume content here..."
+                        className="w-full h-64 bg-gray-50 border border-gray-200 rounded-3xl p-6 text-sm focus:outline-none focus:border-[#1918f0] transition-all"
+                      />
+                    )}
+                    {resumeInputType === 'file' && (
+                      <div 
+                        onClick={() => resumeFileInputRef.current?.click()}
+                        className="border-2 border-dashed border-gray-200 rounded-3xl p-16 text-center cursor-pointer hover:border-[#1918f0]/50 hover:bg-[#1918f0]/5 transition-all"
+                      >
+                        <input type="file" ref={resumeFileInputRef} className="hidden" onChange={(e) => setResumeFiles(Array.from(e.target.files || []))} accept=".pdf,.doc,.docx,.txt" />
+                        <div className="w-16 h-16 bg-[#1918f0]/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                          <svg className="w-8 h-8 text-[#1918f0]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        </div>
+                        <h4 className="font-bold text-[#110584] mb-2">{resumeFiles.length > 0 ? resumeFiles[0].name : "Select resume file"}</h4>
+                        <p className="text-xs text-[#110584]/40 uppercase tracking-widest font-bold">PDF or DOCX</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -259,7 +286,7 @@ const AtsScorer: React.FC = () => {
                 </div>
                 <div className="space-y-4">
                   <h2 className="text-3xl font-bold text-[#110584]">Ready for Analysis</h2>
-                  <p className="text-[#110584]/60 max-w-sm mx-auto">We've gathered all your information. Click below to start the scan.</p>
+                  <p className="text-[#110584]/60 max-sm mx-auto">We've gathered all your information. Click below to start the scan.</p>
                 </div>
 
                 <div className="flex flex-col items-center gap-4">
@@ -341,7 +368,7 @@ const AtsScorer: React.FC = () => {
                 </div>
 
                 <div className="pt-8 border-t border-gray-50 flex justify-center">
-                  <button onClick={() => { setStep(1); setResults(null); }} className="text-sm font-bold text-[#1918f0] hover:underline">Start New Analysis</button>
+                  <button onClick={() => { setStep(1); setResults(null); setJdInputType(null); setResumeInputType(null); }} className="text-sm font-bold text-[#1918f0] hover:underline">Start New Analysis</button>
                 </div>
               </div>
             )}
