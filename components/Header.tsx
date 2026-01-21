@@ -51,7 +51,7 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-100 font-['Work_Sans']">
+    <header className="sticky top-0 z-50 bg-white border-b border-gray-100 font-['Inter Tight']">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}

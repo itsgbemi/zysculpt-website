@@ -3,9 +3,10 @@ import Header from './components/Header.tsx';
 import Hero from './components/Hero.tsx';
 import ResumeTemplatesSection from './components/ResumeTemplatesSection.tsx';
 import InterviewPrep from './components/InterviewPrep.tsx';
+import JobsSection from './components/JobsSection.tsx';
 import Footer from './components/Footer.tsx';
 
-type Mode = 'resume' | 'cover_letter' | 'resignation' | 'interview_prep';
+type Mode = 'resume' | 'cover_letter' | 'resignation' | 'interview_prep' | 'jobs';
 
 const App: React.FC = () => {
   // Helper to get mode from current URL hash
@@ -15,6 +16,7 @@ const App: React.FC = () => {
       if (hash === 'cover-letter') return 'cover_letter';
       if (hash === 'resignation') return 'resignation';
       if (hash === 'interview-prep') return 'interview_prep';
+      if (hash === 'jobs') return 'jobs';
     } catch (e) {
       console.warn("Unable to access window.location.hash");
     }
@@ -36,7 +38,8 @@ const App: React.FC = () => {
     { label: 'For resume', value: 'resume', hash: '#resume' },
     { label: 'For cover letter', value: 'cover_letter', hash: '#cover-letter' },
     { label: 'For resignation', value: 'resignation', hash: '#resignation' },
-    { label: 'Interview Prep', value: 'interview_prep', hash: '#interview-prep' }
+    { label: 'Interview Prep', value: 'interview_prep', hash: '#interview-prep' },
+    { label: 'Jobs', value: 'jobs', hash: '#jobs' }
   ];
 
   const handleNavigate = (newMode: Mode) => {
@@ -47,7 +50,8 @@ const App: React.FC = () => {
     const newHash = newMode === 'resume' ? '#resume' : 
                    newMode === 'cover_letter' ? '#cover-letter' : 
                    newMode === 'resignation' ? '#resignation' :
-                   '#interview-prep';
+                   newMode === 'interview_prep' ? '#interview-prep' :
+                   '#jobs';
     
     try {
       // Use pushState instead of location.hash setter to avoid "Access Denied" on blob origins
@@ -60,7 +64,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col selection:bg-[#1918f0]/10 selection:text-[#1918f0] text-[#0f172a] tracking-tight-custom font-['Work_Sans']">
+    <div className="min-h-screen flex flex-col selection:bg-[#1918f0]/10 selection:text-[#1918f0] text-[#0f172a] font-['Inter Tight']">
       <Header onNavigate={handleNavigate} />
       
       {/* Inner Navigation Tabs */}
@@ -90,6 +94,8 @@ const App: React.FC = () => {
       <main className="flex-1">
         {mode === 'interview_prep' ? (
           <InterviewPrep />
+        ) : mode === 'jobs' ? (
+          <JobsSection />
         ) : (
           <>
             <Hero mode={mode} />

@@ -12,6 +12,16 @@ STRICT OPERATING GUIDELINES:
 
 If information is missing, do not hallucinate placeholders. Instead, ask the user concisely in a separate paragraph.`;
 
+const INTERVIEW_SYSTEM_INSTRUCTION = `You are an expert Interviewer. 
+Your goal is to conduct a professional, conversational mock interview. 
+Guidelines:
+1. Start by asking a relevant interview question.
+2. Wait for the user's response.
+3. Provide very brief, constructive feedback on their answer.
+4. Ask a follow-up or a new question.
+5. Keep the tone professional and encouraging.
+6. Always end your message with a question for the candidate.`;
+
 export interface MediaPart {
   data: string;
   mimeType: string;
@@ -41,7 +51,7 @@ export const getGeminiResponse = async (userMessage: string, mode: string, media
       contents: [{ parts }],
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.1, // Lower temperature to reduce hallucinations
+        temperature: 0.1,
       },
     });
 
@@ -49,5 +59,23 @@ export const getGeminiResponse = async (userMessage: string, mode: string, media
   } catch (error) {
     console.error("Gemini API Error:", error);
     return "Error connecting to AI service.";
+  }
+};
+
+export const getMockInterviewResponse = async (history: { role: 'user' | 'assistant', content: string }[]) => {
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-preview-09-2025',
+      contents: history.map(h => ({ role: h.role === 'user' ? 'user' : 'model', parts: [{ text: h.content }] })),
+      config: {
+        systemInstruction: INTERVIEW_SYSTEM_INSTRUCTION,
+        temperature: 0.7,
+      },
+    });
+    return response.text || "Let's continue the interview. What else would you like to share?";
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+    return "I'm having a bit of trouble connecting to our systems. Could you repeat that?";
   }
 };

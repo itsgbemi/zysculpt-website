@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface FooterProps {
-  onNavigate: (mode: 'resume' | 'cover_letter' | 'resignation' | 'interview_prep') => void;
+  onNavigate: (mode: 'resume' | 'cover_letter' | 'resignation' | 'interview_prep' | 'jobs') => void;
 }
 
 const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
@@ -36,10 +36,10 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
     {
       title: 'Resources',
       links: [
+        { label: 'Jobs', mode: 'jobs' },
         { label: 'Interview Prep', mode: 'interview_prep' },
         { label: 'Career Blog', path: '#' },
-        { label: 'Privacy Policy', path: 'https://app.zysculpt.com' },
-        { label: 'Terms of Service', path: 'https://app.zysculpt.com' }
+        { label: 'Privacy Policy', path: 'https://app.zysculpt.com' }
       ]
     }
   ];
@@ -57,7 +57,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   };
 
   return (
-    <footer className="bg-white border-t border-gray-100 font-['Work_Sans']">
+    <footer className="bg-white border-t border-gray-100 font-['Inter Tight']">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
         {/* Main Columns */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-12 mb-16">

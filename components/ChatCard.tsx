@@ -131,7 +131,7 @@ const FormattedText: React.FC<{
           </div>
         </div>
       ) : (
-        <div className={`space-y-1 ${isResume || isResignation ? 'leading-relaxed text-black' : 'text-inherit'}`} style={{ fontFamily: isResume || isResignation ? "'EB Garamond', serif" : "'Work Sans', sans-serif" }}>
+        <div className={`space-y-1 ${isResume || isResignation ? 'leading-relaxed text-black' : 'text-inherit'}`} style={{ fontFamily: isResume || isResignation ? "'EB Garamond', serif" : "'Onest', sans-serif" }}>
           {lines.map((line, i) => {
             const trimmed = line.trim();
             if (trimmed.startsWith('# ')) return <h1 key={i} className="text-xl font-bold mt-4 mb-2">{trimmed.replace('# ', '')}</h1>;
@@ -398,7 +398,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ mode }) => {
   const showFormInChat = messages.length === 1 && (mode === 'cover_letter' || mode === 'resignation');
 
   return (
-    <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 flex flex-col h-[480px] transform hover:scale-[1.01] transition-all duration-300 z-10 font-['Work_Sans']">
+    <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 flex flex-col h-[480px] transform hover:scale-[1.01] transition-all duration-300 z-10 font-['Onest']">
       <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} accept=".pdf,.doc,.docx,.txt,image/*" multiple />
 
       {/* Header */}

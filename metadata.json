@@ -1,5 +1,7 @@
 {
   "name": "Zysculpt - AI Resume Builder",
   "description": "A high-performance landing page for Zysculpt, an AI-powered suite for resumes, cover letters, and resignation letters, featuring interactive AI chat integration.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "microphone"
+  ]
 }

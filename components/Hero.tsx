@@ -33,10 +33,10 @@ const Hero: React.FC<HeroProps> = ({ mode }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="max-w-2xl">
-            <h1 className="text-5xl lg:text-7xl font-extrabold leading-[1.1] tracking-tighter mb-8 text-[#110584]">
+            <h1 className="text-5xl lg:text-7xl font-semibold leading-[1.15] mb-8 text-[#110584] tracking-[-0.04em]">
               {title}
             </h1>
-            <p className="text-xl text-[#110584]/80 leading-relaxed max-w-xl tracking-tight">
+            <p className="text-xl text-[#110584]/80 leading-relaxed max-w-xl">
               {desc}
             </p>
           </div>

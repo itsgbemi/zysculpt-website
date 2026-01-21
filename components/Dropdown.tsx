@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 
 interface DropdownProps {
@@ -28,7 +27,7 @@ const Dropdown: React.FC<DropdownProps> = ({ label, items, onItemClick }) => {
 
   return (
     <div 
-      className="relative group font-['Work_Sans']" 
+      className="relative group font-['Onest']" 
       ref={dropdownRef}
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
